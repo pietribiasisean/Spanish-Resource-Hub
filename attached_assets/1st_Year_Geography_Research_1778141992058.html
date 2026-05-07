@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geography Study App – Ms McCarthy</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --earth: #1a3a2a;
+    --moss: #2d5a3d;
+    --leaf: #4a8c5c;
+    --sky: #6db8d4;
+    --sand: #f2e8d5;
+    --warm: #e8d5b0;
+    --accent: #e05c2b;
+    --gold: #c9913a;
+    --cream: #faf6ef;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --correct: #2d7a4f;
+    --wrong: #c0392b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--earth);
+    color: white;
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+  .header-icon { font-size: 36px; }
+  .header h1 { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; }
+  .header p { font-size: 13px; opacity: 0.65; margin-top: 2px; }
+  .score-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 40px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex; gap: 12px;
+  }
+  .score-badge span { color: #7ee0a2; }
+
+  /* ── MAIN LAYOUT ── */
+  .container { display: flex; min-height: calc(100vh - 80px); }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--earth);
+    padding: 24px 0;
+    position: sticky;
+    top: 80px;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+  .sidebar-section {
+    padding: 8px 16px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 12px;
+  }
+  .nav-btn {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    color: rgba(255,255,255,0.7);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.07); color: white; }
+  .nav-btn.active { background: rgba(255,255,255,0.1); color: white; border-left-color: var(--leaf); font-weight: 600; }
+  .nav-btn .icon { font-size: 16px; width: 20px; }
+
+  /* ── CONTENT ── */
+  .main { flex: 1; padding: 32px 40px; max-width: 860px; }
+
+  /* ── TOPIC HEADER ── */
+  .topic-header {
+    background: linear-gradient(135deg, var(--moss), var(--earth));
+    color: white;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .topic-header::before {
+    content: attr(data-emoji);
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 72px;
+    opacity: 0.18;
+  }
+  .topic-header h2 { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; margin-bottom: 6px; }
+  .topic-header p { opacity: 0.75; font-size: 14px; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--warm); border-radius: 12px; padding: 4px; }
+  .tab-btn {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    background: none;
+    border-radius: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .tab-btn.active { background: white; color: var(--earth); font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+  /* ── NOTES SECTION ── */
+  .notes-grid { display: flex; flex-direction: column; gap: 16px; }
+  .note-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    border-left: 4px solid var(--leaf);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    animation: fadeIn 0.3s ease;
+  }
+  .note-card h3 { font-family: 'Fraunces', serif; font-size: 17px; color: var(--earth); margin-bottom: 10px; }
+  .note-card ul { padding-left: 18px; }
+  .note-card li { margin-bottom: 6px; font-size: 14px; line-height: 1.6; color: #333; }
+  .note-card p { font-size: 14px; line-height: 1.7; color: #333; }
+  .key-term { background: #edf7f0; border-radius: 6px; padding: 2px 8px; font-weight: 600; color: var(--moss); display: inline-block; margin: 2px; font-size: 13px; }
+  .example-tag { background: #fff3e0; color: #c86010; border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── QUIZ SECTION ── */
+  .quiz-container { display: flex; flex-direction: column; gap: 0; }
+  .quiz-progress {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .progress-bar { flex: 1; height: 8px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--leaf), var(--sky)); border-radius: 99px; transition: width 0.4s ease; }
+  .progress-text { font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+
+  .question-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    animation: slideIn 0.3s ease;
+  }
+  .question-num { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--leaf); margin-bottom: 8px; }
+  .question-text { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: var(--earth); margin-bottom: 24px; line-height: 1.4; }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    text-align: left;
+    padding: 14px 18px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fafafa;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--leaf); background: #f0faf4; }
+  .option-btn.correct { border-color: var(--correct); background: #edf7f0; color: var(--correct); font-weight: 600; }
+  .option-btn.wrong { border-color: var(--wrong); background: #fdf0ef; color: var(--wrong); font-weight: 600; }
+  .option-btn:disabled { cursor: default; }
+  .option-letter {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .correct .option-letter { background: var(--correct); color: white; }
+  .wrong .option-letter { background: var(--wrong); color: white; }
+
+  .feedback-box {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    display: none;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-box.correct-fb { background: #edf7f0; border: 1px solid #a3d9b1; color: #1a5c35; }
+  .feedback-box.wrong-fb { background: #fdf0ef; border: 1px solid #f4a99a; color: #8b1a1a; }
+  .feedback-box strong { font-weight: 700; }
+
+  .quiz-nav {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--earth); color: white; }
+  .btn-primary:hover { background: var(--moss); transform: translateY(-1px); }
+  .btn-secondary { background: #e5e7eb; color: #374151; }
+  .btn-secondary:hover { background: #d1d5db; }
+  .btn:disabled { opacity: 0.4; cursor: default; transform: none !important; }
+
+  /* ── FLASHCARDS ── */
+  .flashcard-area { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  .flashcard-wrap { perspective: 1000px; width: 100%; max-width: 560px; height: 260px; cursor: pointer; }
+  .flashcard {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    backface-visibility: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  .card-front { background: linear-gradient(135deg, var(--earth), var(--moss)); color: white; }
+  .card-back { background: white; color: var(--earth); transform: rotateY(180deg); border: 2px solid var(--warm); }
+  .card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.55; margin-bottom: 12px; }
+  .card-term { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 900; text-align: center; line-height: 1.3; }
+  .card-back .card-term { font-size: 18px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+  .flip-hint { font-size: 12px; opacity: 0.5; margin-top: 16px; }
+
+  .fc-controls { display: flex; gap: 12px; align-items: center; }
+  .fc-counter { font-size: 14px; color: var(--muted); font-weight: 500; }
+
+  /* ── RESULTS ── */
+  .results-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    animation: fadeIn 0.4s ease;
+  }
+  .results-card .big-score { font-family: 'Fraunces', serif; font-size: 72px; font-weight: 900; color: var(--earth); line-height: 1; }
+  .results-card .score-label { color: var(--muted); font-size: 16px; margin: 8px 0 24px; }
+  .results-card .grade { display: inline-block; padding: 8px 24px; border-radius: 40px; font-weight: 700; font-size: 18px; margin-bottom: 24px; }
+  .grade-a { background: #d1fae5; color: #065f46; }
+  .grade-b { background: #dbeafe; color: #1e40af; }
+  .grade-c { background: #fef3c7; color: #92400e; }
+  .grade-d { background: #fee2e2; color: #991b1b; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
+
+  /* ── HOME ── */
+  .home-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .topic-card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    position: relative;
+    overflow: hidden;
+  }
+  .topic-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--leaf), var(--sky));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s;
+  }
+  .topic-card:hover { border-color: var(--leaf); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .topic-card:hover::after { transform: scaleX(1); }
+  .topic-card .tc-emoji { font-size: 32px; margin-bottom: 10px; }
+  .topic-card h3 { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; color: var(--earth); margin-bottom: 4px; }
+  .topic-card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .topic-card .tc-count { font-size: 11px; font-weight: 700; color: var(--leaf); margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .home-welcome {
+    background: linear-gradient(135deg, var(--earth) 0%, var(--moss) 60%, #3a7a55 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-welcome::before {
+    content: '🌍';
+    position: absolute;
+    right: -10px;
+    bottom: -20px;
+    font-size: 120px;
+    opacity: 0.12;
+  }
+  .home-welcome h2 { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 900; margin-bottom: 8px; }
+  .home-welcome p { opacity: 0.8; line-height: 1.6; font-size: 15px; max-width: 480px; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-icon">🌍</div>
+  <div>
+    <h1>Geography Study App</h1>
+    <p>Ms McCarthy · Junior Cycle · 1st Year</p>
+  </div>
+  <div class="score-badge">
+    🏆 Score: <span id="totalScore">0</span> / <span id="totalPossible">0</span>
+  </div>
+</header>
+
+<div class="container">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-section">Start Here</div>
+    <button class="nav-btn active" onclick="showHome(this)">
+      <span class="icon">🏠</span> Home
+    </button>
+
+    <div class="sidebar-section">Chapters</div>
+    <button class="nav-btn" onclick="showTopic(this,'earth')">
+      <span class="icon">🌐</span> Dynamic Earth
+    </button>
+    <button class="nav-btn" onclick="showTopic(this,'volcanoes')">
+      <span class="icon">🌋</span> Volcanoes
+    </button>
+    <button class="nav-btn" onclick="showTopic(this,'earthquakes')">
+      <span class="icon">💥</span> Earthquakes
+    </button>
+    <button class="nav-btn" onclick="showTopic(this,'fold')">
+      <span class="icon">⛰️</span> Fold Mountains
+    </button>
+    <button class="nav-btn" onclick="showTopic(this,'rocks')">
+      <span class="icon">🪨</span> Rocks
+    </button>
+    <button class="nav-btn" onclick="showTopic(this,'weathering')">
+      <span class="icon">🌧️</span> Weathering
+    </button>
+    <button class="nav-btn" onclick="showTopic(this,'rivers')">
+      <span class="icon">🌊</span> Rivers
+    </button>
+    <button class="nav-btn" onclick="showTopic(this,'maps')">
+      <span class="icon">🗺️</span> OS Maps
+    </button>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main" id="mainContent">
+    <!-- HOME -->
+    <div id="homePage">
+      <div class="home-welcome">
+        <h2>Welcome to Your Geography Study Hub! 👋</h2>
+        <p>All your class notes from Ms McCarthy's PowerPoints are here. Use Notes to review, Flashcards to memorise key terms, and Quiz yourself to test your knowledge!</p>
+      </div>
+      <div class="home-grid">
+        <div class="topic-card" onclick="showTopicById('earth')">
+          <div class="tc-emoji">🌐</div>
+          <h3>The Dynamic Earth</h3>
+          <p>Layers, plate tectonics, Pangaea, convection currents & plate boundaries</p>
+          <div class="tc-count">10 quiz questions · 8 flashcards</div>
+        </div>
+        <div class="topic-card" onclick="showTopicById('volcanoes')">
+          <div class="tc-emoji">🌋</div>
+          <h3>Volcanoes</h3>
+          <p>Pacific Ring of Fire, mid-ocean ridges, volcanic mountains & life cycle</p>
+          <div class="tc-count">10 quiz questions · 8 flashcards</div>
+        </div>
+        <div class="topic-card" onclick="showTopicById('earthquakes')">
+          <div class="tc-emoji">💥</div>
+          <h3>Earthquakes</h3>
+          <p>Focus, epicentre, seismic waves, Richter Scale & tsunamis</p>
+          <div class="tc-count">10 quiz questions · 8 flashcards</div>
+        </div>
+        <div class="topic-card" onclick="showTopicById('fold')">
+          <div class="tc-emoji">⛰️</div>
+          <h3>Fold Mountains</h3>
+          <p>Formation, anticlines/synclines & three periods of folding</p>
+          <div class="tc-count">8 quiz questions · 7 flashcards</div>
+        </div>
+        <div class="topic-card" onclick="showTopicById('rocks')">
+          <div class="tc-emoji">🪨</div>
+          <h3>Rocks</h3>
+          <p>Igneous, sedimentary & metamorphic rock formation and examples</p>
+          <div class="tc-count">10 quiz questions · 8 flashcards</div>
+        </div>
+        <div class="topic-card" onclick="showTopicById('weathering')">
+          <div class="tc-emoji">🌧️</div>
+          <h3>Weathering</h3>
+          <p>Mechanical (freeze-thaw), chemical (carbonation) & biological weathering</p>
+          <div class="tc-count">10 quiz questions · 8 flashcards</div>
+        </div>
+        <div class="topic-card" onclick="showTopicById('rivers')">
+          <div class="tc-emoji">🌊</div>
+          <h3>Rivers</h3>
+          <p>Stages, erosion processes, transportation & deposition</p>
+          <div class="tc-count">10 quiz questions · 8 flashcards</div>
+        </div>
+        <div class="topic-card" onclick="showTopicById('maps')">
+          <div class="tc-emoji">🗺️</div>
+          <h3>Ordnance Survey Maps</h3>
+          <p>Scale, legend, direction, grid references & LEN method</p>
+          <div class="tc-count">8 quiz questions · 6 flashcards</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOPIC PAGE -->
+    <div id="topicPage" class="hidden">
+      <div class="topic-header" id="topicHeader" data-emoji="🌍">
+        <h2 id="topicTitle">Topic</h2>
+        <p id="topicSubtitle">Subtitle</p>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('notes',this)">📖 Notes</button>
+        <button class="tab-btn" onclick="switchTab('flashcards',this)">🃏 Flashcards</button>
+        <button class="tab-btn" onclick="switchTab('quiz',this)">✏️ Quiz</button>
+      </div>
+      <div id="tabNotes"></div>
+      <div id="tabFlashcards" class="hidden"></div>
+      <div id="tabQuiz" class="hidden"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════ */
+const topics = {
+  earth: {
+    title: "The Dynamic Earth",
+    subtitle: "Layers, Plate Tectonics & Continental Drift",
+    emoji: "🌐",
+    notes: [
+      {
+        heading: "Layers of the Earth",
+        content: [
+          "<strong>Crust</strong> – Outermost layer. Made of solid rock. Continents and oceans sit on top.",
+          "<strong>Mantle</strong> – Lies under the crust. Made of molten/semi-molten rock called <span class='key-term'>magma</span>.",
+          "<strong>Outer Core</strong> – Made of liquid iron and nickel.",
+          "<strong>Inner Core</strong> – Solid iron and nickel. Hottest part at <strong>6,000°C</strong>."
+        ]
+      },
+      {
+        heading: "Plate Tectonics",
+        content: [
+          "The Earth's crust is broken into constantly moving pieces called <span class='key-term'>plates</span>.",
+          "Plates with land = <span class='key-term'>continental plates</span>. Plates with oceans = <span class='key-term'>oceanic plates</span>.",
+          "Plates meet at <span class='key-term'>plate boundaries</span>.",
+          "Alfred Wegener's theory: all continents were once joined as <span class='key-term'>Pangaea</span> ('all land'). This breaking apart is called <span class='key-term'>continental drift</span>.",
+          "Pangaea broke into <strong>Laurasia</strong> (north) and <strong>Gondwanaland</strong> (south)."
+        ]
+      },
+      {
+        heading: "Convection Currents",
+        content: [
+          "Magma in the mantle is heated, <strong>rises</strong> toward the crust, moves sideways and pulls plates.",
+          "As magma cools it <strong>sinks</strong> back down and the cycle repeats.",
+          "This causes plates to: <strong>Collide</strong> / <strong>Separate</strong> / <strong>Slide past</strong> each other."
+        ]
+      },
+      {
+        heading: "Plate Boundaries",
+        content: [
+          "<strong>Destructive:</strong> Plates collide. Heavier plate subducts under lighter plate. Fold mountains + volcanoes formed. <span class='example-tag'>Example</span> Andes – Nazca plate vs South American plate.",
+          "<strong>Constructive:</strong> Plates move apart. Magma rises, cools, forms new crust. Volcanic islands + mid-ocean ridges. <span class='example-tag'>Example</span> Iceland – Eurasian plate separating from North American plate.",
+          "<strong>Passive:</strong> Plates slide past each other. Causes earthquakes. <span class='example-tag'>Example</span> San Andreas Fault, USA."
+        ]
+      }
+    ],
+    flashcards: [
+      { term: "Magma", def: "Molten rock found in the mantle beneath the Earth's crust." },
+      { term: "Plates", def: "Large slabs of rock that make up the Earth's crust, constantly moving." },
+      { term: "Pangaea", def: "The supercontinent where all land was joined together, proposed by Alfred Wegener." },
+      { term: "Continental Drift", def: "Wegener's theory that continents slowly move apart from each other over millions of years." },
+      { term: "Convection Currents", def: "Circular movement of magma in the mantle that causes tectonic plates to move." },
+      { term: "Subduction", def: "When a heavier plate is pushed under a lighter plate at a destructive boundary." },
+      { term: "Destructive Boundary", def: "Where two plates collide, creating fold mountains and volcanoes. One plate is destroyed." },
+      { term: "Constructive Boundary", def: "Where two plates move apart, magma rises and new crust is formed." }
+    ],
+    quiz: [
+      { q: "What is the hottest layer of the Earth?", opts: ["Crust","Mantle","Outer Core","Inner Core"], ans: 3, exp: "The inner core is the hottest part at 6,000°C. It is made of solid iron and nickel." },
+      { q: "What is molten rock inside the Earth called?", opts: ["Lava","Magma","Basalt","Granite"], ans: 1, exp: "Molten rock inside the Earth is called magma. When it reaches the surface it is called lava." },
+      { q: "Who proposed the theory of continental drift?", opts: ["Isaac Newton","Alfred Wegener","Charles Darwin","Galileo"], ans: 1, exp: "Alfred Wegener proposed that all continents were once joined in a supercontinent called Pangaea." },
+      { q: "What was the name of the supercontinent that existed millions of years ago?", opts: ["Laurasia","Gondwanaland","Pangaea","Eurasia"], ans: 2, exp: "Pangaea means 'all land'. It later broke into Laurasia (north) and Gondwanaland (south)." },
+      { q: "What type of plates have continents on top?", opts: ["Oceanic plates","Continental plates","Tectonic plates","Mantle plates"], ans: 1, exp: "Plates with land on top are called continental plates; plates with ocean on top are oceanic plates." },
+      { q: "What causes plates to move?", opts: ["Gravity","Wind","Convection currents","Tides"], ans: 2, exp: "Convection currents in the mantle cause plates to move as heated magma rises, moves sideways and sinks." },
+      { q: "At a destructive plate boundary, what happens to the heavier plate?", opts: ["It floats upward","It is subducted under the lighter plate","It moves sideways","It dissolves in magma"], ans: 1, exp: "The heavier (oceanic) plate is pushed under the lighter (continental) plate in a process called subduction." },
+      { q: "Iceland is an example of a volcanic island formed at which type of boundary?", opts: ["Destructive","Passive","Constructive","Transform"], ans: 2, exp: "Iceland formed at a constructive boundary where the Eurasian plate separates from the North American plate." },
+      { q: "The Andes mountains formed where which two plates collide?", opts: ["Eurasian & North American","Nazca & South American","African & Arabian","Indo-Australian & Eurasian"], ans: 1, exp: "The Andes are fold mountains formed where the Nazca Plate collides with the South American Plate." },
+      { q: "What is the layer between the crust and the core called?", opts: ["Asthenosphere","Lithosphere","Mantle","Biosphere"], ans: 2, exp: "The mantle lies between the crust and core and is made of semi-molten rock called magma." }
+    ]
+  },
+
+  volcanoes: {
+    title: "Volcanoes",
+    subtitle: "Ring of Fire, Mid-Ocean Ridges & Volcanic Mountains",
+    emoji: "🌋",
+    notes: [
+      {
+        heading: "Volcanologists",
+        content: [
+          "A <span class='key-term'>volcanologist</span> is a scientist who studies volcanoes.",
+          "They study volcanic rock, ash, gases and monitor changes in shape to predict eruptions."
+        ]
+      },
+      {
+        heading: "Pacific Ring of Fire",
+        content: [
+          "A zone around the Pacific Ocean where <strong>most of the world's earthquakes and volcanoes</strong> occur.",
+          "This is because most tectonic plate activity in the world happens here."
+        ]
+      },
+      {
+        heading: "Mid-Ocean Ridge",
+        content: [
+          "Found at a <span class='key-term'>constructive plate boundary</span>.",
+          "Magma rises through fissures in the crust, cools and hardens forming <strong>underwater mountain chains</strong>.",
+          "<span class='example-tag'>Example</span> Mid-Atlantic Ridge – American plates separating from Eurasian and African plates."
+        ]
+      },
+      {
+        heading: "Volcanic Mountain (Stratovolcano)",
+        content: [
+          "Occurs at a <strong>destructive plate boundary</strong>.",
+          "Magma rises from a <span class='key-term'>magma chamber</span> through a <span class='key-term'>vent</span> – becomes <span class='key-term'>lava</span> on surface.",
+          "Lava, hot ash and rocks erupt from the <span class='key-term'>crater</span>, forming an <span class='key-term'>ash cloud</span>.",
+          "Repeated eruptions build up layers forming a <strong>cone-shaped mountain</strong>.",
+          "<span class='example-tag'>Example</span> Mount Etna, Italy."
+        ]
+      },
+      {
+        heading: "Life Cycle of a Volcano",
+        content: [
+          "<strong>Active</strong> – Erupts regularly. e.g. Mount Etna (Sicily), Mount St. Helens (USA)",
+          "<strong>Dormant</strong> – Has not erupted for a long time but could erupt again. e.g. Mount Vesuvius, Italy",
+          "<strong>Extinct</strong> – Will not erupt again. e.g. Lambay Island, Dublin / Croghan Hill, Co. Offaly"
+        ]
+      },
+      {
+        heading: "Positive Effects of Volcanic Activity",
+        content: [
+          "<strong>Volcanic soils</strong> – Rich in minerals, excellent for agriculture. <span class='example-tag'>Example</span> Mt. Vesuvius, Campania, Italy",
+          "<strong>Tourism</strong> – Volcano hikes, hot springs and geysers attract tourists. <span class='example-tag'>Example</span> Mt. Etna, Sicily & Iceland"
+        ]
+      }
+    ],
+    flashcards: [
+      { term: "Volcanologist", def: "A scientist who studies volcanoes, volcanic rocks, ash and gases." },
+      { term: "Pacific Ring of Fire", def: "Zone around the Pacific Ocean with most of the world's earthquakes and volcanoes." },
+      { term: "Mid-Ocean Ridge", def: "Underwater mountain chain formed at constructive boundaries where magma rises through the ocean floor." },
+      { term: "Vent", def: "The channel through which magma travels from the magma chamber to the surface." },
+      { term: "Crater", def: "The opening at the top of a volcano from which lava, ash and gases are erupted." },
+      { term: "Active Volcano", def: "A volcano that erupts regularly, e.g. Mount Etna, Sicily." },
+      { term: "Dormant Volcano", def: "A volcano that has not erupted for a long time but could erupt again, e.g. Mount Vesuvius." },
+      { term: "Extinct Volcano", def: "A volcano that will not erupt again, e.g. Lambay Island, Dublin." }
+    ],
+    quiz: [
+      { q: "What do volcanologists study?", opts: ["Ocean floors","Volcanoes, volcanic rock, ash and gases","Weather patterns","River systems"], ans: 1, exp: "Volcanologists study volcanoes, volcanic rock, ash and gases and monitor changes to predict eruptions." },
+      { q: "Where do most of the world's earthquakes and volcanoes occur?", opts: ["Mediterranean Ring","Pacific Ring of Fire","Atlantic Ridge","Arctic Zone"], ans: 1, exp: "The Pacific Ring of Fire is where most of the world's tectonic activity, earthquakes and volcanoes occur." },
+      { q: "What type of plate boundary creates a mid-ocean ridge?", opts: ["Destructive","Passive","Constructive","Transform"], ans: 2, exp: "Mid-ocean ridges form at constructive plate boundaries where plates move apart and magma fills the gap." },
+      { q: "The Mid-Atlantic Ridge is an example of which feature?", opts: ["Fold mountain","Volcanic crater","Mid-Ocean Ridge","Fault line"], ans: 2, exp: "The Mid-Atlantic Ridge is a chain of underwater mountains formed where American plates separate from Eurasian and African plates." },
+      { q: "What is lava?", opts: ["Magma inside the Earth","Magma that has reached the Earth's surface","Volcanic ash","Underground rock"], ans: 1, exp: "When magma reaches the surface of the Earth through a vent, it is called lava." },
+      { q: "Mount Vesuvius is an example of which type of volcano?", opts: ["Active","Dormant","Extinct","Constructive"], ans: 1, exp: "Mount Vesuvius in Italy is dormant – it has not erupted for a long time but could erupt again." },
+      { q: "Which Irish location is an example of an extinct volcano?", opts: ["Croagh Patrick","Lambay Island","Slieve Bloom","Carrauntoohil"], ans: 1, exp: "Lambay Island, Dublin and Croghan Hill, Co. Offaly are examples of extinct volcanoes in Ireland." },
+      { q: "Why are volcanic soils good for farming?", opts: ["They are very sandy","They are rich in minerals","They retain more water","They are easier to dig"], ans: 1, exp: "Volcanic soils are rich in minerals which makes them fertile and excellent for growing crops." },
+      { q: "At what type of plate boundary do volcanic mountains (stratovolcanoes) form?", opts: ["Constructive","Passive","Destructive","Mid-ocean"], ans: 2, exp: "Volcanic mountains form at destructive plate boundaries where one plate is subducted under another." },
+      { q: "What shape does a stratovolcano have?", opts: ["Flat-topped","Dome-shaped","Cone-shaped","Pyramid"], ans: 2, exp: "As eruptions add layer upon layer of lava and ash, a cone-shaped mountain is formed." }
+    ]
+  },
+
+  earthquakes: {
+    title: "Earthquakes",
+    subtitle: "Focus, Epicentre, Seismic Waves, Richter Scale & Tsunamis",
+    emoji: "💥",
+    notes: [
+      {
+        heading: "What is an Earthquake?",
+        content: [
+          "When plates press against (destructive) or slide past (passive) each other, <strong>pressure builds up along the fault line</strong>.",
+          "When plates suddenly move, this pressure is released as an <span class='key-term'>earthquake</span>.",
+          "<span class='example-tag'>Example</span> San Andreas Fault, USA (passive boundary)"
+        ]
+      },
+      {
+        heading: "Parts of an Earthquake",
+        content: [
+          "<span class='key-term'>Focus</span> – The point beneath the surface where the earthquake begins in the crust.",
+          "<span class='key-term'>Epicentre</span> – Point on the surface directly above the focus. Tremors are strongest here. Greatest damage occurs here.",
+          "<span class='key-term'>Seismic/Shock Waves</span> – Series of tremors released from the focus that shake the earth.",
+          "<span class='key-term'>Fault Line</span> – The crack in the crust between two moving plates."
+        ]
+      },
+      {
+        heading: "Aftershocks",
+        content: [
+          "Earthquakes rarely last longer than <strong>one minute</strong>.",
+          "<span class='key-term'>Aftershocks</span> are small tremors that occur hours or days after the main earthquake.",
+          "Can cause <strong>more damage</strong> than the original earthquake as buildings are already weakened."
+        ]
+      },
+      {
+        heading: "Measuring Earthquakes",
+        content: [
+          "A <span class='key-term'>seismologist</span> studies earthquakes.",
+          "Tremors are measured by a <span class='key-term'>seismograph</span> or seismometer.",
+          "<strong>Richter Scale</strong> / <strong>Moment Magnitude Scale (MMS)</strong> – measure strength. Tenfold increase per number.",
+          "<strong>Mercalli Scale</strong> – describes strength visually."
+        ]
+      },
+      {
+        heading: "Tsunamis",
+        content: [
+          "A <span class='key-term'>tsunami</span> is a huge tidal wave caused by an <strong>underwater earthquake</strong>.",
+          "The undersea earthquake disturbs the seabed, causing powerful waves in all directions.",
+          "Waves can reach up to <strong>30 metres high</strong> near the coast (as tall as a 10-storey building!)."
+        ]
+      },
+      {
+        heading: "Damage & Reducing Impact",
+        content: [
+          "Damage: Loss of life, damaged buildings, fires, disease spread, landslides.",
+          "Reduction: <strong>Earthquake-resistant buildings</strong> with shock absorbers & steel-reinforced walls.",
+          "Conduct earthquake/tsunami <strong>drills</strong> and install <strong>early-warning systems</strong>."
+        ]
+      }
+    ],
+    flashcards: [
+      { term: "Focus", def: "The point beneath the Earth's surface where an earthquake begins." },
+      { term: "Epicentre", def: "The point on the surface directly above the focus. Strongest tremors and greatest damage occur here." },
+      { term: "Seismic Waves", def: "Series of tremors/shock waves released from the focus that shake the Earth." },
+      { term: "Fault Line", def: "A crack in the Earth's crust between two moving tectonic plates." },
+      { term: "Aftershock", def: "Small tremors that occur hours or days after the main earthquake, often causing further damage." },
+      { term: "Seismograph", def: "An instrument used to measure the tremors of an earthquake." },
+      { term: "Richter Scale", def: "A scale used to measure the strength of an earthquake. Each number is 10 times stronger than the previous." },
+      { term: "Tsunami", def: "A huge tidal wave caused by an underwater earthquake. Waves can be up to 30 metres high." }
+    ],
+    quiz: [
+      { q: "What is the point beneath the surface where an earthquake begins?", opts: ["Epicentre","Fault Line","Focus","Seismic zone"], ans: 2, exp: "The focus is the point beneath the Earth's surface where the earthquake begins in the crust." },
+      { q: "Where is the greatest damage in an earthquake?", opts: ["At the focus","At the epicentre","Along the fault line","In the mantle"], ans: 1, exp: "The epicentre is the point on the surface directly above the focus. Tremors are strongest and damage greatest here." },
+      { q: "What instrument measures earthquake tremors?", opts: ["Barometer","Seismograph","Thermometer","Compass"], ans: 1, exp: "A seismograph (or seismometer) is used to measure the tremors produced by an earthquake." },
+      { q: "What causes a tsunami?", opts: ["A volcanic eruption on land","An underwater earthquake","Heavy rainfall","A tropical storm"], ans: 1, exp: "A tsunami is a huge tidal wave caused by an underwater earthquake that disturbs the seabed." },
+      { q: "How high can tsunami waves be as they reach the coast?", opts: ["5 metres","15 metres","30 metres","100 metres"], ans: 2, exp: "Tsunami waves can be up to 30 metres high as they approach shallow water near the coast — as tall as a 10-storey building." },
+      { q: "What is an aftershock?", opts: ["The main earthquake","A small tremor before an earthquake","Small tremors occurring after an earthquake","A type of tsunami"], ans: 2, exp: "Aftershocks are small tremors that occur hours or days after the main earthquake. They can cause additional damage to weakened buildings." },
+      { q: "The San Andreas Fault in the USA is an example of which type of plate boundary?", opts: ["Constructive","Destructive","Passive","Ocean ridge"], ans: 2, exp: "The San Andreas Fault is a passive plate boundary where plates slide past each other, causing earthquakes." },
+      { q: "Which scale uses visual observation to describe earthquake strength?", opts: ["Richter Scale","Moment Magnitude Scale","Mercalli Scale","Beaufort Scale"], ans: 2, exp: "The Mercalli Scale describes the strength of an earthquake using visual observations of damage rather than measurements." },
+      { q: "What type of buildings help reduce earthquake damage?", opts: ["Wooden buildings","Mud-brick buildings","Earthquake-resistant buildings with shock absorbers","Tall glass buildings"], ans: 2, exp: "Earthquake-resistant buildings with shock absorbers between the building and foundations, and steel-reinforced walls help reduce damage." },
+      { q: "How long do earthquakes usually last?", opts: ["Less than one minute","1–5 minutes","5–10 minutes","Over 10 minutes"], ans: 0, exp: "Earthquakes rarely last longer than one minute, though aftershocks can occur for hours or days afterward." }
+    ]
+  },
+
+  fold: {
+    title: "Fold Mountains",
+    subtitle: "Formation, Anticlines & Synclines, Periods of Folding",
+    emoji: "⛰️",
+    notes: [
+      {
+        heading: "Formation of Fold Mountains",
+        content: [
+          "Formed at a <span class='key-term'>destructive plate boundary</span>.",
+          "The heavier plate sinks into the mantle (subduction) under the lighter plate.",
+          "The lighter plate <strong>buckles and folds upwards</strong>.",
+          "<span class='key-term'>Anticlines</span> (upfolds) and <span class='key-term'>Synclines</span> (downfolds) are created.",
+          "Magma can move to the surface, forming <strong>volcanoes</strong>.",
+          "<span class='example-tag'>Example</span> The Andes – Nazca plate collides with South American plate."
+        ]
+      },
+      {
+        heading: "Three Periods of Folding",
+        content: [
+          "<strong>Alpine Folding</strong> – 30–35 million years ago. Alps (Europe), Andes (S. America), Himalayas (Asia)",
+          "<strong>Armorican Folding</strong> – 250 million years ago. Munster mountains: MacGillycuddy's Reeks (Kerry), Comeragh, Knockmealdown, Galtee Mountains",
+          "<strong>Caledonian Folding</strong> – 400 million years ago. Dublin & Wicklow Mountains, Appalachian Mountains (USA)"
+        ]
+      }
+    ],
+    flashcards: [
+      { term: "Anticline", def: "An upward fold in rock layers formed during mountain building." },
+      { term: "Syncline", def: "A downward fold in rock layers formed during mountain building." },
+      { term: "Alpine Folding", def: "Mountain building period 30-35 million years ago creating the Alps, Andes and Himalayas." },
+      { term: "Armorican Folding", def: "Mountain building period 250 million years ago creating Munster mountains (MacGillycuddy's Reeks, Galtees etc.)." },
+      { term: "Caledonian Folding", def: "Mountain building period 400 million years ago creating Dublin & Wicklow Mountains." },
+      { term: "Fold Mountains", def: "Mountains formed when plates collide and the crust buckles and folds upward at a destructive boundary." },
+      { term: "MacGillycuddy's Reeks", def: "Armorican fold mountains in Co. Kerry, containing Carrauntoohil, Ireland's highest peak." }
+    ],
+    quiz: [
+      { q: "At which type of plate boundary do fold mountains form?", opts: ["Constructive","Passive","Destructive","Mid-ocean"], ans: 2, exp: "Fold mountains form at destructive plate boundaries where plates collide and the lighter plate buckles upward." },
+      { q: "What is an anticline?", opts: ["A downward fold in rock","An upward fold in rock","A type of volcano","A plate boundary"], ans: 1, exp: "An anticline is an upward fold in rock layers created during the collision of tectonic plates." },
+      { q: "The Andes are an example of fold mountains formed by which plates colliding?", opts: ["Eurasian & African","Nazca & South American","North American & Eurasian","Indo-Australian & Eurasian"], ans: 1, exp: "The Andes formed where the Nazca Plate collides with the South American Plate at a destructive boundary." },
+      { q: "Which period of folding created the Alps, Andes and Himalayas?", opts: ["Caledonian","Armorican","Alpine","Hercynian"], ans: 2, exp: "Alpine folding occurred 30-35 million years ago and created the Alps (Europe), Andes (South America) and Himalayas (Asia)." },
+      { q: "The MacGillycuddy's Reeks were formed during which period of folding?", opts: ["Alpine","Caledonian","Armorican","Hercynian"], ans: 2, exp: "The MacGillycuddy's Reeks and other Munster mountains were formed during Armorican folding, 250 million years ago." },
+      { q: "The Dublin and Wicklow Mountains formed during which period?", opts: ["Alpine","Armorican","Caledonian","Pangaean"], ans: 2, exp: "The Dublin and Wicklow Mountains formed during Caledonian folding, approximately 400 million years ago." },
+      { q: "Which is the OLDEST period of mountain folding?", opts: ["Alpine (30-35 million years ago)","Armorican (250 million years ago)","Caledonian (400 million years ago)","Hercynian (300 million years ago)"], ans: 2, exp: "Caledonian folding is the oldest at around 400 million years ago, followed by Armorican (250 million) and Alpine (30-35 million)." },
+      { q: "What is a syncline?", opts: ["An upward fold in rock","A type of fault","A downward fold in rock","A volcanic crater"], ans: 2, exp: "A syncline is a downward fold in rock layers, the opposite of an anticline." }
+    ]
+  },
+
+  rocks: {
+    title: "Rocks",
+    subtitle: "Igneous, Sedimentary & Metamorphic Rock Types",
+    emoji: "🪨",
+    notes: [
+      {
+        heading: "What is Rock?",
+        content: [
+          "Rock is the <strong>hard material that forms Earth's crust</strong>.",
+          "Rocks are made of various <span class='key-term'>minerals</span> held together by natural cement.",
+          "Rocks are divided into <strong>THREE groups</strong> according to how they were formed."
+        ]
+      },
+      {
+        heading: "Igneous Rocks",
+        content: [
+          "Formed from <strong>volcanic activity</strong> – hot molten magma cooled and solidified.",
+          "<strong>Intrusive</strong> – magma cooled slowly underground → large crystals.",
+          "<strong>Extrusive</strong> – lava cooled quickly on the surface → small/no crystals.",
+          "<strong>Granite</strong> – Intrusive. Pink/cream/grey. Coarse grained. Minerals: Quartz, Feldspar, Mica. <span class='example-tag'>Example</span> Wicklow Mountains. Used for kitchen countertops.",
+          "<strong>Basalt</strong> – Extrusive. Grey/black. Medium grained. Minerals: Magnesium & Iron. <span class='example-tag'>Example</span> Giant's Causeway, Antrim. Used for road chippings."
+        ]
+      },
+      {
+        heading: "Sedimentary Rocks",
+        content: [
+          "Formed from remains of <span class='key-term'>sediments</span> – other rocks, fossils and plants deposited on seabeds and lakes.",
+          "Compressed and cemented together over millions of years.",
+          "<strong>Limestone</strong> – Formed from skeletons of tiny sea creatures, fish and shells. White/grey. Permeable. Laid down in <span class='key-term'>strata</span> (layers).",
+          "<strong>Sandstone</strong> – Formed from grains of sand compressed together."
+        ]
+      },
+      {
+        heading: "Metamorphic Rocks",
+        content: [
+          "Existing igneous or sedimentary rocks <strong>changed by great heat and pressure</strong> into newer, harder rocks.",
+          "<span class='example-tag'>Examples</span> Marble (from Limestone), Quartzite (from Sandstone), Schist (from Mudstone)"
+        ]
+      }
+    ],
+    flashcards: [
+      { term: "Igneous Rock", def: "Rock formed when magma or lava cools and solidifies. Granite (intrusive) and Basalt (extrusive) are examples." },
+      { term: "Sedimentary Rock", def: "Rock formed from compressed and cemented sediments (remains of rocks, fossils, shells). Limestone and Sandstone are examples." },
+      { term: "Metamorphic Rock", def: "Rock changed from igneous or sedimentary rock by great heat and pressure. Marble and Quartzite are examples." },
+      { term: "Granite", def: "Intrusive igneous rock. Magma cooled slowly underground making large crystals. Found in the Wicklow Mountains." },
+      { term: "Basalt", def: "Extrusive igneous rock. Lava cooled quickly on the surface making tiny crystals. Found at the Giant's Causeway." },
+      { term: "Limestone", def: "Sedimentary rock formed from skeletons of sea creatures. Permeable and laid down in strata (layers)." },
+      { term: "Strata", def: "Layers in which sedimentary rocks are deposited." },
+      { term: "Permeable", def: "Allows water to pass through it. Limestone is an example of a permeable rock." }
+    ],
+    quiz: [
+      { q: "How many rock groups are there?", opts: ["Two","Three","Four","Five"], ans: 1, exp: "Rocks are divided into THREE groups: Igneous, Sedimentary and Metamorphic, based on how they were formed." },
+      { q: "What type of rock is Granite?", opts: ["Sedimentary","Metamorphic","Extrusive igneous","Intrusive igneous"], ans: 3, exp: "Granite is an intrusive igneous rock. Magma cooled slowly underground, creating large crystals." },
+      { q: "Why does Granite have large crystals?", opts: ["It cooled very quickly","It cooled very slowly underground","It contains lots of iron","It was compressed by great pressure"], ans: 1, exp: "Granite cooled very slowly underground inside the crust, which allowed large crystals to form over millions of years." },
+      { q: "The Giant's Causeway in Co. Antrim is made of which rock?", opts: ["Granite","Limestone","Basalt","Sandstone"], ans: 2, exp: "The Giant's Causeway is made of basalt — an extrusive igneous rock that cooled and contracted to form hexagonal shapes." },
+      { q: "How are sedimentary rocks formed?", opts: ["From cooling magma","From changing existing rocks by heat & pressure","From sediments compressed and cemented together","From volcanic lava"], ans: 2, exp: "Sedimentary rocks form when sediments (particles of rock, shells, fossils) are deposited, compressed and cemented together over millions of years." },
+      { q: "Limestone is described as 'permeable' — what does this mean?", opts: ["It is very hard","It allows water to pass through it","It sinks in water","It dissolves easily"], ans: 1, exp: "Permeable means water can pass through the rock. Limestone is permeable and also laid down in strata (layers)." },
+      { q: "What are metamorphic rocks?", opts: ["Rocks formed from cooled magma","Rocks formed from sediments","Existing rocks changed by heat and pressure","Rocks found only at the ocean floor"], ans: 2, exp: "Metamorphic rocks are igneous or sedimentary rocks that have been changed into newer, harder rocks by great heat and pressure." },
+      { q: "Which minerals are found in Granite?", opts: ["Magnesium and Iron","Quartz, Feldspar and Mica","Calcium and Carbon","Gold and Silver"], ans: 1, exp: "Granite contains Quartz, Feldspar and Mica as its main mineral content." },
+      { q: "The Wicklow Mountains are mainly made of which rock?", opts: ["Limestone","Basalt","Granite","Sandstone"], ans: 2, exp: "The Wicklow Mountains are made of granite, an intrusive igneous rock formed underground." },
+      { q: "Limestone was formed from which materials?", opts: ["Sand grains","Skeletons of sea creatures, fish and shells","Volcanic ash","Compressed mud"], ans: 1, exp: "Limestone formed on the beds of shallow, warm seas from skeletons of tiny sea creatures, fish and shells, compressed over millions of years." }
+    ]
+  },
+
+  weathering: {
+    title: "Weathering",
+    subtitle: "Mechanical, Chemical & Biological Weathering",
+    emoji: "🌧️",
+    notes: [
+      {
+        heading: "Key Concepts",
+        content: [
+          "<span class='key-term'>Denudation</span> – The wearing down of rocks by weathering and erosion.",
+          "<span class='key-term'>Weathering</span> – The process that physically/chemically changes solid rock into smaller pieces. <strong>Sediments remain in place.</strong>",
+          "<span class='key-term'>Erosion</span> – Breaks down AND <strong>moves</strong> sediments away (by water, wind, glaciers, gravity).",
+          "Three types of weathering: <strong>Mechanical</strong>, <strong>Chemical</strong>, <strong>Biological</strong>."
+        ]
+      },
+      {
+        heading: "Mechanical Weathering – Freeze-Thaw Action",
+        content: [
+          "Most common form. Very active in upland (mountain) areas.",
+          "1. Rainwater gathers in <strong>joints</strong> (cracks) in rocks.",
+          "2. Temperature drops below 0°C → water <strong>freezes</strong> to ice, expanding by up to <strong>10%</strong>.",
+          "3. Pressure builds on the rock.",
+          "4. Temperature rises → ice <strong>thaws</strong>.",
+          "5. Repeated freezing/thawing widens joints → rock breaks into smaller pieces called <span class='key-term'>scree</span>.",
+          "<span class='example-tag'>Example</span> Croagh Patrick, Co. Mayo"
+        ]
+      },
+      {
+        heading: "Biological Weathering",
+        content: [
+          "Rocks worn away by <strong>animals, plants and living organisms</strong>.",
+          "Tree roots grow into cracks in rocks, pushing them open over time.",
+          "Eventually the plant breaks the rock apart.",
+          "<span class='example-tag'>Example</span> Weeds pushing through pavement cracks; tree roots in rock joints."
+        ]
+      },
+      {
+        heading: "Chemical Weathering (Carbonation)",
+        content: [
+          "Rainwater + CO₂ = weak <span class='key-term'>carbonic acid</span>.",
+          "Acid dissolves limestone along <span class='key-term'>joints</span> and <span class='key-term'>bedding planes</span>.",
+          "Creates karst landscape features: <span class='key-term'>Clints</span> (flat blocks), <span class='key-term'>Grikes</span> (gaps), <span class='key-term'>Swallow holes</span>, <span class='key-term'>Caves</span>, <span class='key-term'>Stalactites</span> & <span class='key-term'>Stalagmites</span>.",
+          "<span class='example-tag'>Example</span> The Burren, Co. Clare"
+        ]
+      }
+    ],
+    flashcards: [
+      { term: "Denudation", def: "The wearing down of the Earth's surface by weathering and erosion." },
+      { term: "Weathering", def: "The process that breaks down solid rock into smaller pieces. The broken sediments remain in place." },
+      { term: "Erosion", def: "The process that breaks down AND moves sediments away by water, wind, ice or gravity." },
+      { term: "Freeze-Thaw Action", def: "Mechanical weathering where water in rock cracks freezes, expands (10%) and breaks the rock apart. Produces scree." },
+      { term: "Scree", def: "Broken pieces of rock that accumulate at the bottom of a slope as a result of freeze-thaw action." },
+      { term: "Biological Weathering", def: "Weathering caused by plants and animals. Tree roots grow into cracks and eventually break rocks apart." },
+      { term: "Carbonation", def: "Chemical weathering where rainwater (containing CO₂) forms carbonic acid that dissolves limestone." },
+      { term: "Stalactites & Stalagmites", def: "Cave formations in limestone caves. Stalactites hang from the ceiling; stalagmites grow from the floor." }
+    ],
+    quiz: [
+      { q: "What is denudation?", opts: ["The movement of sediments by rivers","The wearing down of rocks by weathering and erosion","The formation of new rock","The folding of mountains"], ans: 1, exp: "Denudation is the wearing down of the Earth's surface caused by the processes of weathering and erosion." },
+      { q: "What is the key difference between weathering and erosion?", opts: ["Weathering is faster than erosion","Weathering breaks rock but leaves it in place; erosion moves the sediments","Erosion only happens in oceans","Weathering only happens underground"], ans: 1, exp: "Weathering breaks down rock and leaves sediments in place. Erosion breaks down AND transports sediments away." },
+      { q: "What is the most common form of mechanical weathering?", opts: ["Carbonation","Biological weathering","Freeze-thaw action","Abrasion"], ans: 2, exp: "Freeze-thaw action is the most common form of mechanical weathering and is very active in upland/mountain areas." },
+      { q: "By how much does water expand when it freezes?", opts: ["2%","5%","10%","25%"], ans: 2, exp: "Water expands by up to 10% when it freezes. This expansion puts pressure on the surrounding rock, widening cracks." },
+      { q: "What is scree?", opts: ["A type of cave feature","Broken rock pieces at the bottom of a mountain slope","A form of chemical weathering","Underground water"], ans: 1, exp: "Scree is the broken pieces of rock that roll down and gather at the bottom of a slope as a result of freeze-thaw action." },
+      { q: "Which is an example of a location where freeze-thaw action occurs in Ireland?", opts: ["The Burren, Co. Clare","The Curragh, Co. Kildare","Croagh Patrick, Co. Mayo","The Cliffs of Moher"], ans: 2, exp: "Croagh Patrick in Co. Mayo is an upland area where freeze-thaw action is active due to cold temperatures." },
+      { q: "What causes biological weathering?", opts: ["Rainwater dissolving rock","Ice expanding in cracks","Plants and animals breaking down rock","Wind removing rock particles"], ans: 2, exp: "Biological weathering is caused by plants and animals. Tree roots growing in rock cracks can eventually break rocks apart." },
+      { q: "What type of weathering creates features like clints, grikes and swallow holes?", opts: ["Mechanical weathering","Biological weathering","Chemical weathering (carbonation)","Freeze-thaw action"], ans: 2, exp: "Carbonation (chemical weathering) dissolves limestone and creates karst landscape features like clints, grikes, swallow holes and caves." },
+      { q: "The Burren in Co. Clare is an example of what type of landscape?", opts: ["A volcanic landscape","A glacial landscape","A karst limestone landscape","A coastal landscape"], ans: 2, exp: "The Burren is an example of a karst limestone landscape formed by carbonation (chemical weathering)." },
+      { q: "Where does freeze-thaw action mainly occur?", opts: ["In coastal areas","In desert areas","In upland/mountain areas","In river valleys"], ans: 2, exp: "Freeze-thaw action is most active in upland (mountain) areas where temperatures regularly drop below freezing." }
+    ]
+  },
+
+  rivers: {
+    title: "Rivers",
+    subtitle: "Stages, Erosion, Transportation & Deposition",
+    emoji: "🌊",
+    notes: [
+      {
+        heading: "Key River Terms",
+        content: [
+          "<span class='key-term'>Source</span> – Where the river begins (usually in mountains).",
+          "<span class='key-term'>Tributary</span> – A smaller river that flows into the main river.",
+          "<span class='key-term'>Confluence</span> – Where two rivers meet.",
+          "<span class='key-term'>Watershed</span> – The high ground dividing two river basins.",
+          "<span class='key-term'>River Basin</span> – The area drained by a river and its tributaries.",
+          "<span class='key-term'>Mouth</span> – Where the river flows into the sea.",
+          "<span class='key-term'>Estuary</span> – The wide mouth of a river where freshwater meets the sea."
+        ]
+      },
+      {
+        heading: "Three Stages of a River",
+        content: [
+          "<strong>Youthful/Upper Stage</strong> – High in mountains. Steep gradient. Fast flowing. Erosion dominant.",
+          "<strong>Mature/Middle Stage</strong> – Mid-slope. Gentler gradient. Transportation dominant.",
+          "<strong>Old/Lower Stage</strong> – Near sea level. Very gentle gradient. Slow flow. Deposition dominant."
+        ]
+      },
+      {
+        heading: "Processes of River Erosion",
+        content: [
+          "<span class='key-term'>Hydraulic Action</span> – The force of moving water wears away river bed and banks.",
+          "<span class='key-term'>Abrasion</span> – The river's load (rocks/sediment) erodes the river bed.",
+          "<span class='key-term'>Attrition</span> – Rocks break up as they hit off each other.",
+          "<span class='key-term'>Solution</span> – Minerals from rocks dissolve in the river water."
+        ]
+      },
+      {
+        heading: "River Transportation",
+        content: [
+          "<span class='key-term'>Suspension</span> – Light materials float along in water.",
+          "<span class='key-term'>Traction</span> – Large stones rolled along the river bed.",
+          "<span class='key-term'>Saltation</span> – Smaller pebbles bounced along the river bed.",
+          "<span class='key-term'>Solution</span> – Materials dissolve and are carried along."
+        ]
+      },
+      {
+        heading: "River Deposition",
+        content: [
+          "Deposition occurs when the river <strong>slows down</strong> or loses energy.",
+          "Causes: Reduction in river speed / Increase in load size / Reduction in water volume / Flatter gradient."
+        ]
+      }
+    ],
+    flashcards: [
+      { term: "Source", def: "The starting point of a river, usually high up in the mountains." },
+      { term: "Tributary", def: "A smaller river or stream that flows into the main river." },
+      { term: "Confluence", def: "The point where two rivers meet and join together." },
+      { term: "Hydraulic Action", def: "Erosion where the force of moving water wears away the river bed and banks." },
+      { term: "Abrasion", def: "Erosion where the river's load (rocks & sediment) scrapes and wears away the river bed." },
+      { term: "Attrition", def: "Erosion where rocks and stones carried by the river break up by hitting each other." },
+      { term: "Traction", def: "Transportation method where large stones are rolled along the river bed." },
+      { term: "Saltation", def: "Transportation method where smaller pebbles are bounced along the river bed." }
+    ],
+    quiz: [
+      { q: "Where does a river begin?", opts: ["At the mouth","At the confluence","At the source","At the watershed"], ans: 2, exp: "A river begins at its source, usually high up in the mountains where rainwater collects." },
+      { q: "What is a tributary?", opts: ["Where a river meets the sea","A smaller river joining the main river","The high ground between two rivers","The end of a river"], ans: 1, exp: "A tributary is a smaller river or stream that flows into the main river." },
+      { q: "Where does a river meet the sea?", opts: ["The source","The watershed","The confluence","The mouth/estuary"], ans: 3, exp: "A river ends at its mouth or estuary, where it flows into the sea." },
+      { q: "In which stage of a river is erosion dominant?", opts: ["Old stage (lower)","Mature stage (middle)","Youthful stage (upper)","All stages equally"], ans: 2, exp: "In the youthful/upper stage, the river has a steep gradient and fast flow, making erosion the dominant process." },
+      { q: "What is hydraulic action?", opts: ["Rocks dissolving in water","Rocks hitting each other","Force of moving water wearing away banks","The river's load eroding the bed"], ans: 2, exp: "Hydraulic action is where the force of moving water itself wears away the river bed and banks." },
+      { q: "What is attrition?", opts: ["River load eroding the bed","Rocks breaking up by hitting each other","Dissolved minerals carried in water","Large boulders rolled along the bed"], ans: 1, exp: "Attrition is when rocks and stones carried by the river break up and become smaller by hitting off each other." },
+      { q: "Large boulders rolling along the river bed is called?", opts: ["Suspension","Saltation","Solution","Traction"], ans: 3, exp: "Traction is the process where large stones are rolled along the river bed by the force of the moving water." },
+      { q: "What is saltation?", opts: ["Dissolved materials carried in water","Light materials floating on top","Smaller pebbles bouncing along the bed","Large rocks sliding along the bed"], ans: 2, exp: "Saltation is when smaller pebbles are bounced along the river bed in a hopping/skipping motion." },
+      { q: "What causes a river to deposit its load?", opts: ["The river speeds up","The river narrows","The river slows down or loses energy","The river gets deeper"], ans: 2, exp: "Deposition occurs when the river slows down and loses energy, e.g. when the gradient becomes flatter near the sea." },
+      { q: "What is the area drained by a river and all its tributaries called?", opts: ["Watershed","Estuary","River basin","Confluence"], ans: 2, exp: "A river basin is the total area of land drained by a river and all of its tributaries." }
+    ]
+  },
+
+  maps: {
+    title: "Ordnance Survey Maps",
+    subtitle: "Scale, Legend, Direction & Grid References",
+    emoji: "🗺️",
+    notes: [
+      {
+        heading: "What is an OS Map?",
+        content: [
+          "Maps are <strong>representations of the world</strong>.",
+          "People who create maps are called <span class='key-term'>Cartographers</span>.",
+          "Ireland's national mapping agency is <span class='key-term'>Ordnance Survey Ireland (OSI)</span>."
+        ]
+      },
+      {
+        heading: "Scale",
+        content: [
+          "<span class='key-term'>Scale</span> = distance on the map compared to distance on the ground.",
+          "OS Maps use <strong>1:50,000</strong> → Every 1 cm on the map = 50,000 cm (500 m) on the ground.",
+          "Also 1:25,000 and 1:10,000 scales."
+        ]
+      },
+      {
+        heading: "Legend",
+        content: [
+          "A <span class='key-term'>legend</span> is a key to help find specific elements on a map.",
+          "Common symbols: Garda Station, Camping Site, Golf Course, Post Office, Tourist Info, National roads, Airport, Railway station."
+        ]
+      },
+      {
+        heading: "Direction",
+        content: [
+          "Directions given using <strong>cardinal points</strong>: North, South, East, West.",
+          "<strong>North is always shown</strong> on OS maps.",
+          "Remember whether you are travelling <em>towards</em> or <em>from</em> an area."
+        ]
+      },
+      {
+        heading: "Grid References & The National Grid",
+        content: [
+          "The <span class='key-term'>National Grid</span> is used to locate places on OS maps.",
+          "Each square = 100 km × 100 km, represented by a <strong>letter</strong> (subzone).",
+          "Subzones divided into 1 km × 1 km squares with eastings (horizontal) and northings (vertical).",
+          "<strong>LEN Method</strong>: L = Letter (subzone), E = Easting (corridor, FIRST), N = Northing (stairs, SECOND).",
+          "<strong>Four-figure</strong> = area location. <strong>Six-figure</strong> = exact location."
+        ]
+      }
+    ],
+    flashcards: [
+      { term: "Cartographer", def: "A person who creates maps." },
+      { term: "OSI (Ordnance Survey Ireland)", def: "Ireland's national mapping agency, responsible for creating official maps of Ireland." },
+      { term: "Scale (1:50,000)", def: "Every 1 cm on the map equals 50,000 cm (500 metres) on the ground." },
+      { term: "Legend", def: "The key on a map that explains the symbols and features shown." },
+      { term: "National Grid", def: "The system used to locate places on OS maps using letters, eastings and northings." },
+      { term: "LEN Method", def: "How to read a grid reference: Letter (subzone), Easting (along corridor), Northing (up stairs)." }
+    ],
+    quiz: [
+      { q: "What is a cartographer?", opts: ["A map reader","A person who creates maps","A geographer","An explorer"], ans: 1, exp: "A cartographer is a person who creates maps. Ireland's national mapping agency is Ordnance Survey Ireland (OSI)." },
+      { q: "On a 1:50,000 OS map, 1 cm represents how much distance on the ground?", opts: ["50 cm","500 cm (5 metres)","50,000 cm (500 metres)","1 km"], ans: 2, exp: "On a 1:50,000 scale map, every 1 cm on the map equals 50,000 cm, which is 500 metres on the ground." },
+      { q: "What is the legend on a map?", opts: ["The title of the map","A key explaining the symbols","The compass direction","The scale of the map"], ans: 1, exp: "The legend (or key) is a guide that explains what all the symbols on the map represent." },
+      { q: "In the LEN method, which do you read FIRST?", opts: ["Northing (vertical)","Letter only","Easting (horizontal)","Both at the same time"], ans: 2, exp: "In the LEN method: L=Letter, E=Easting (along the corridor FIRST), N=Northing (up the stairs SECOND)." },
+      { q: "What does a six-figure grid reference give you?", opts: ["An area","An approximate location","An exact location","A country"], ans: 2, exp: "A six-figure grid reference gives an exact location, whereas a four-figure grid reference gives the location of an area." },
+      { q: "What is always shown at the top of an OS map?", opts: ["The legend","The scale","North","The county name"], ans: 2, exp: "North is always shown on OS maps. This allows you to determine direction." },
+      { q: "What does OSI stand for?", opts: ["Ordnance Survey Ireland","Official Survey of Ireland","Ordnance Science Institute","Ocean Survey Ireland"], ans: 0, exp: "OSI stands for Ordnance Survey Ireland — Ireland's national mapping agency." },
+      { q: "What size is each National Grid square?", opts: ["10 km × 10 km","50 km × 50 km","100 km × 100 km","1 km × 1 km"], ans: 2, exp: "Each National Grid square (subzone) measures 100 km by 100 km and is represented by a letter of the alphabet." }
+    ]
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════ */
+let currentTopic = null;
+let currentTab = 'notes';
+let quizIndex = 0;
+let quizAnswered = false;
+let quizScore = 0;
+let quizTotal = 0;
+let fcIndex = 0;
+let totalScore = 0;
+let totalPossible = 0;
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════════ */
+function showHome(btn) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('homePage').classList.remove('hidden');
+  document.getElementById('topicPage').classList.add('hidden');
+}
+
+function showTopicById(id) {
+  const btn = [...document.querySelectorAll('.nav-btn')].find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${id}'`));
+  if(btn) showTopic(btn, id);
+}
+
+function showTopic(btn, id) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('homePage').classList.add('hidden');
+  document.getElementById('topicPage').classList.remove('hidden');
+
+  currentTopic = id;
+  quizIndex = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  fcIndex = 0;
+
+  const t = topics[id];
+  document.getElementById('topicTitle').textContent = t.title;
+  document.getElementById('topicSubtitle').textContent = t.subtitle;
+  document.getElementById('topicHeader').setAttribute('data-emoji', t.emoji);
+
+  // Reset tabs
+  document.querySelectorAll('.tab-btn').forEach((b,i) => { b.classList.toggle('active', i===0); });
+  currentTab = 'notes';
+  document.getElementById('tabNotes').classList.remove('hidden');
+  document.getElementById('tabFlashcards').classList.add('hidden');
+  document.getElementById('tabQuiz').classList.add('hidden');
+
+  renderNotes();
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentTab = tab;
+  document.getElementById('tabNotes').classList.toggle('hidden', tab !== 'notes');
+  document.getElementById('tabFlashcards').classList.toggle('hidden', tab !== 'flashcards');
+  document.getElementById('tabQuiz').classList.toggle('hidden', tab !== 'quiz');
+
+  if(tab === 'notes') renderNotes();
+  else if(tab === 'flashcards') renderFlashcards();
+  else if(tab === 'quiz') renderQuiz();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NOTES
+═══════════════════════════════════════════════════════════════ */
+function renderNotes() {
+  const t = topics[currentTopic];
+  const el = document.getElementById('tabNotes');
+  el.innerHTML = `<div class="notes-grid">${t.notes.map(n => `
+    <div class="note-card">
+      <h3>${n.heading}</h3>
+      <ul>${n.content.map(c => `<li>${c}</li>`).join('')}</ul>
+    </div>`).join('')}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FLASHCARDS
+═══════════════════════════════════════════════════════════════ */
+function renderFlashcards() {
+  const t = topics[currentTopic];
+  const cards = t.flashcards;
+  const el = document.getElementById('tabFlashcards');
+  el.innerHTML = `
+    <div class="flashcard-area">
+      <div class="flashcard-wrap" onclick="flipCard()">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <div class="card-label">Term</div>
+            <div class="card-term" id="fcTerm">${cards[fcIndex].term}</div>
+            <div class="flip-hint">👆 Tap to reveal definition</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-label">Definition</div>
+            <div class="card-term" id="fcDef">${cards[fcIndex].def}</div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-controls">
+        <button class="btn btn-secondary" onclick="prevCard()">← Prev</button>
+        <span class="fc-counter" id="fcCounter">1 / ${cards.length}</span>
+        <button class="btn btn-primary" onclick="nextCard()">Next →</button>
+      </div>
+    </div>`;
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function nextCard() {
+  const cards = topics[currentTopic].flashcards;
+  fcIndex = (fcIndex + 1) % cards.length;
+  updateCard();
+}
+
+function prevCard() {
+  const cards = topics[currentTopic].flashcards;
+  fcIndex = (fcIndex - 1 + cards.length) % cards.length;
+  updateCard();
+}
+
+function updateCard() {
+  const cards = topics[currentTopic].flashcards;
+  document.getElementById('flashcard').classList.remove('flipped');
+  setTimeout(() => {
+    document.getElementById('fcTerm').textContent = cards[fcIndex].term;
+    document.getElementById('fcDef').textContent = cards[fcIndex].def;
+    document.getElementById('fcCounter').textContent = `${fcIndex+1} / ${cards.length}`;
+  }, 300);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════════════════════════════ */
+function renderQuiz() {
+  const t = topics[currentTopic];
+  const q = t.quiz;
+  if(quizIndex >= q.length) { renderResults(); return; }
+
+  const current = q[quizIndex];
+  const letters = ['A','B','C','D'];
+  const pct = (quizIndex / q.length * 100).toFixed(0);
+
+  document.getElementById('tabQuiz').innerHTML = `
+    <div class="quiz-container">
+      <div class="quiz-progress">
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="progress-text">Question ${quizIndex+1} of ${q.length}</span>
+        <span class="progress-text" style="color:var(--leaf)">✓ ${quizScore}</span>
+      </div>
+      <div class="question-card">
+        <div class="question-num">Question ${quizIndex+1}</div>
+        <div class="question-text">${current.q}</div>
+        <div class="options">
+          ${current.opts.map((opt,i) => `
+            <button class="option-btn" onclick="selectAnswer(${i})" id="opt${i}">
+              <span class="option-letter">${letters[i]}</span>
+              ${opt}
+            </button>`).join('')}
+        </div>
+        <div class="feedback-box" id="feedbackBox"></div>
+        <div class="quiz-nav">
+          <div></div>
+          <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none">
+            ${quizIndex < q.length-1 ? 'Next Question →' : 'See Results 🎉'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  quizAnswered = false;
+}
+
+function selectAnswer(chosen) {
+  if(quizAnswered) return;
+  quizAnswered = true;
+  const t = topics[currentTopic];
+  const current = t.quiz[quizIndex];
+  const correct = current.ans;
+  const isRight = chosen === correct;
+
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if(i === correct) btn.classList.add('correct');
+    else if(i === chosen && !isRight) btn.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedbackBox');
+  fb.className = `feedback-box show ${isRight ? 'correct-fb' : 'wrong-fb'}`;
+  fb.innerHTML = isRight
+    ? `✅ <strong>Correct!</strong> ${current.exp}`
+    : `❌ <strong>The correct answer was: ${current.opts[correct]}.</strong> ${current.exp}`;
+
+  if(isRight) quizScore++;
+
+  document.getElementById('nextBtn').style.display = 'block';
+}
+
+function nextQuestion() {
+  quizIndex++;
+  renderQuiz();
+}
+
+function renderResults() {
+  const t = topics[currentTopic];
+  const total = t.quiz.length;
+  const pct = Math.round(quizScore / total * 100);
+  let grade, gradeClass;
+  if(pct >= 85) { grade = '🌟 Excellent!'; gradeClass = 'grade-a'; }
+  else if(pct >= 70) { grade = '👍 Good Work!'; gradeClass = 'grade-b'; }
+  else if(pct >= 50) { grade = '📚 Keep Studying!'; gradeClass = 'grade-c'; }
+  else { grade = '💪 Review the Notes!'; gradeClass = 'grade-d'; }
+
+  // Update global score
+  totalScore += quizScore;
+  totalPossible += total;
+  document.getElementById('totalScore').textContent = totalScore;
+  document.getElementById('totalPossible').textContent = totalPossible;
+
+  document.getElementById('tabQuiz').innerHTML = `
+    <div class="results-card">
+      <div class="big-score">${quizScore}/${total}</div>
+      <div class="score-label">${pct}% correct</div>
+      <div class="grade ${gradeClass}">${grade}</div>
+      <p style="color:var(--muted);margin-bottom:24px;font-size:14px">
+        ${pct >= 70 ? "Great effort on this topic! Try the next chapter." : "Don't worry — review the notes and flashcards, then try again!"}
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button class="btn btn-secondary" onclick="switchTab('notes',document.querySelectorAll('.tab-btn')[0])">📖 Review Notes</button>
+        <button class="btn btn-primary" onclick="restartQuiz()">🔄 Try Again</button>
+      </div>
+    </div>`;
+}
+
+function restartQuiz() {
+  quizIndex = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  renderQuiz();
+}
+</script>
+</body>
+</html>

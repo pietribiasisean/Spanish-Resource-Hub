@@ -1,45 +1,51 @@
-# [Project name]
+# Spanish Study App — 1st Year 2025–26
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A Spanish study website for 1st Year Junior Cycle students, modelled on the Geography Study App. Contains all class notes, flashcards, quizzes, and a retrieval practice journal for QP1 Units 1–5.
 
 ## Run & Operate
 
+- `pnpm --filter @workspace/spanish-study run dev` — run the Spanish Study App (frontend only)
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Frontend: React + Vite (artifacts/spanish-study)
+- API: Express 5 (artifacts/api-server)
+- DB: PostgreSQL + Drizzle ORM (not yet used — app is frontend-only)
+- Styling: Custom CSS (no Tailwind used in main app — pure CSS in index.css)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
-
-## Architecture decisions
-
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- `artifacts/spanish-study/src/App.tsx` — entire Spanish study app (data + UI)
+- `artifacts/spanish-study/src/index.css` — Spanish-themed CSS
+- `lib/api-spec/openapi.yaml` — API spec (health check only)
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+A study hub for 1st Year Spanish students with:
+- **5 units** (QP1): Bienvenidos, En el Aula, Los Números, Todo sobre Mí, Mi Familia
+- Each unit has: **Notes** (vocabulary tables, grammar explanations, cultural content), **Flashcards** (flip-card memory tool), **Quiz** (10 MCQ with explanations), **Retrieval Journal** (tracks revision sessions with dates, stars, checkboxes)
+- Spanish flag-themed dark navy/red/gold colour scheme
+- Quiz score tracker in header
+
+## Architecture decisions
+
+- Frontend-only app — no backend needed for a study resource site
+- All content is hardcoded in App.tsx as a typed data structure (`TOPICS`)
+- Retrieval journal state persisted to localStorage per unit
+- Pure CSS (no Tailwind) to match the Geography Study App pattern
+- Single App.tsx file keeps the content and UI co-located for easy editing
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Style should be similar to the Geography Study App (sidebar, tabs, cards)
+- Each unit should be separated with subtopics
+- Include a Retrieval Journal section matching the RJ Spanish PDF
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Content lives entirely in the `TOPICS` constant in App.tsx — edit there to update notes/flashcards/quiz
+- Adding a new unit: add a key to `TOPICS` and it will appear automatically in sidebar and home grid
